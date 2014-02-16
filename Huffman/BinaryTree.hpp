@@ -17,8 +17,22 @@ class BinaryTree
         TreeNode* pRight;
     };
 
+	TreeNode* createNode(const T& _val)
+	{
+		TreeNode* tmp = new TreeNode(_val);
+		if (!tmp)
+		{
+			return NULL;
+		}
+		return tmp;
+	}
+
+	TreeNode* root;
+
+public:
     class BinTreeIter
     {
+		friend class BinaryTree;
         TreeNode* ptr;
     public:
         BinTreeIter(TreeNode* node)
@@ -52,23 +66,11 @@ class BinaryTree
         }
     };
 
-    TreeNode* createNode(const T& _val)
-    {
-        TreeNode* tmp = new TreeNode();
-        if (!tmp)
-        {
-            return NULL;
-        }
-        tmp->val = _val;
-        return tmp;
-    }
-
-    TreeNode* root;
-public:
     BinaryTree()
     {
         this->root = NULL;
     }
+
     ~BinaryTree()
     {
         deleteNode(root);
@@ -94,37 +96,52 @@ public:
 
     bool initRoot(const T& val)
     {
-        if (!root = createNode(val))
+        if (!(root = createNode(val)))
         {
             return false;
         }
         return true;
     }
 
-    bool adoptLeft(BinTreeIter* iter, const T& val)
+	void adoptLeftNode(BinTreeIter& iter, TreeNode& node)
+	{
+		if (iter.ptr->pLeft)
+		{
+			deleteNode(iter.ptr->pLeft);
+		}
+		iter.ptr->pLeft = &node;
+	}
+
+	void adoptRightNode(BinTreeIter& iter, TreeNode& node)
+	{
+		if (iter.ptr->pRight)
+		{
+			deleteNode(iter.ptr->pRight);
+		}
+		iter.ptr->pRight = &node;
+	}
+
+    bool adoptLeftVal(BinTreeIter& iter, const T& val)
     {
-        if ((*iter)->pLeft)
-        {
-            deleteNode((*iter)->pLeft);
-        }
-        if (!(*iter)->pLeft = createNode(val))
+		TreeNode* tmp;
+        if (!(tmp = createNode(val)))
         {
             return false;
         }
+		adoptLeftNode(iter, *tmp);
         return true;
     }
-    bool adoptRight(BinTreeIter* iter, const T& val)
-    {
-        if ((*iter)->pRight)
-        {
-            deleteNode((*iter)->pRight);
-        }
-        if (!(*iter)->pRight = createNode(val))
-        {
-            return false;
-        }
-        return true;
-    }
+
+	bool adoptRightVal(BinTreeIter& iter, const T& val)
+	{
+		TreeNode* tmp;
+		if (!(tmp = createNode(val)))
+		{
+			return false;
+		}
+		adoptRightNode(iter, *tmp);
+		return true;
+	}
 };
 
 #endif //BINARY_TREE_HPP
