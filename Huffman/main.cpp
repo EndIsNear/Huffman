@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Utils.h"
+#include "Huffman.h"
 
 int main(int argc, char *argv[])
 {

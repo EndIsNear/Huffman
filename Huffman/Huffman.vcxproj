@@ -79,11 +79,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="Huffman.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BinaryTree.hpp" />
-    <ClInclude Include="Utils.h" />
+    <ClInclude Include="Huffman.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

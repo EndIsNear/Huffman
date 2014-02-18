@@ -27,8 +27,39 @@ class BinaryTree
 		return tmp;
 	}
 
-	TreeNode* root;
+	void adopt(TreeNode** dest, TreeNode** src) {
+		deleteNode(*dest);
+		*dest = *src;
+		*src = NULL;
+	}
 
+	void copyNode(TreeNode** dest, TreeNode const * src)
+	{
+		if (src == NULL)
+			*dest = NULL;
+		else
+		{
+			*dest = new TreeNode;
+			*dest->inf = src->inf;
+			copyNode(*dest->left, src->left);
+			copyNode(*dest->right, src->right);
+		}
+	}
+
+	void deleteNode(TreeNode* node)
+	{
+		if (node != NULL)
+		{
+			if (node->pLeft)
+			{
+				deleteNode(node->pLeft);
+				deleteNode(node->pRight);
+			}
+			delete node;
+		}
+	}
+
+	TreeNode* root;
 public:
     class BinTreeIter
     {
@@ -42,12 +73,12 @@ public:
 
         BinTreeIter operator++()
         {
-            return this->ptr = this->ptr->pLeft;
+            return BinTreeIter(ptr->pLeft);
         }
         BinTreeIter operator++(int)
         {
-            return this->ptr = this->ptr->pRight;
-        }
+			return BinTreeIter(ptr->pRight);
+		}
         T& operator*() const
         {
             return this->ptr->val;
@@ -76,26 +107,19 @@ public:
         deleteNode(root);
     }
 
+	bool isEmpty()
+	{
+		return root == NULL;
+	}
+
     BinTreeIter& GetIter()const
     {
         return BinTreeIter(root);
     }
 
-    void deleteNode(TreeNode* node)
-    {
-        if (node->pLeft)
-        {
-            deleteNode(node->pLeft);
-        }
-        if (node->pRight)
-        {
-            deleteNode(node->pRight);
-        }
-        delete node;
-    }
-
     bool initRoot(const T& val)
     {
+		deleteNode(root);
         if (!(root = createNode(val)))
         {
             return false;
@@ -103,44 +127,25 @@ public:
         return true;
     }
 
-	void adoptLeftNode(BinTreeIter& iter, TreeNode& node)
+	void adoptLeft(BinaryTree& t)
 	{
-		if (iter.ptr->pLeft)
+		if (root != NULL)
 		{
-			deleteNode(iter.ptr->pLeft);
+			adopt(&(root->pLeft), &t.root);
 		}
-		iter.ptr->pLeft = &node;
 	}
 
-	void adoptRightNode(BinTreeIter& iter, TreeNode& node)
+	void adoptRight(BinaryTree& t)
 	{
-		if (iter.ptr->pRight)
+		if (root != NULL)
 		{
-			deleteNode(iter.ptr->pRight);
+			adopt(&(root->pRight), &t.root);
 		}
-		iter.ptr->pRight = &node;
 	}
 
-    bool adoptLeftVal(BinTreeIter& iter, const T& val)
-    {
-		TreeNode* tmp;
-        if (!(tmp = createNode(val)))
-        {
-            return false;
-        }
-		adoptLeftNode(iter, *tmp);
-        return true;
-    }
-
-	bool adoptRightVal(BinTreeIter& iter, const T& val)
+	T& GetRoot()
 	{
-		TreeNode* tmp;
-		if (!(tmp = createNode(val)))
-		{
-			return false;
-		}
-		adoptRightNode(iter, *tmp);
-		return true;
+		return *this->root;
 	}
 };
 
