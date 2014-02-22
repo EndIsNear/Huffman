@@ -2,36 +2,11 @@
 #define _CRT_SECURE_NO_DEPRECATE
 
 #include <iostream>
-#include <stdio.h>
-#include <cstdlib>
-#include "BinaryTree.hpp"
+#include <new>
+#include "HuffTree.hpp"
+#include "heap.hpp"
 
 #define READ_SIZE 1024
-
-struct TreeVal
-{
-	TreeVal(){}
-	TreeVal(char _val, int _weigth)
-	{
-		val = _val;
-		weigth = _weigth;
-	}
-	char val;
-	size_t weigth;
-};
-
-int compareTrees(const void* left, const void* right)
-{
-	TreeVal leftVal = ((BinaryTree<TreeVal>*)left)->GetRoot;
-		//, rightVal = ((BinaryTree<TreeVal>*)right)->GetRoot;
-
-	//if (leftVal.weigth < rightVal.weigth)
-	//	return -1;
-	//if (leftVal.weigth == rightVal.weigth)
-	//	return 0;
-	//if (leftVal.weigth > rightVal.weigth)
-	//	return 1;
-}
 
 void countChars(FILE* input, int* chars)
 {
@@ -46,63 +21,65 @@ void countChars(FILE* input, int* chars)
 	}
 }
 
-bool buildHuffTree(FILE* input, BinaryTree<TreeVal>& tree)
+HuffNode* buildTree(int * cntChars)
 {
-	int chars[256] = { 0 };
-	int cnt = 0;
+	Heap<HuffNode*> huffNodes;
+	HuffNode* root = NULL;
 
-	countChars(input, chars);
-	//for (int i = 0; i < 256; ++i)
-	//{
-	//	std::cout << (char)i << " : " << chars[i] << std::endl;
-	//}
-	for (int i = 0; i < 256; ++i)
+	for (int i = 0, cnt = 0; i < 256; ++i)
 	{
-		if (chars[i] > 0)
+		if (cntChars[i] > 0)
 		{
+			HuffNode * tmp;
+			tmp = new HuffNode(cntChars[i], NULL, NULL, (char)i);
+			
+			huffNodes.Push(tmp, cntChars[i]);
 			++cnt;
 		}
 	}
-	BinaryTree<TreeVal>* nodes = new BinaryTree<TreeVal>[cnt];
-	if (!nodes)
+
+	while (!huffNodes.IsEmpty())
 	{
-		return false;
+		root = new(HuffNode);
+		root->pLeft = huffNodes.Pop();
+		root->pRight = huffNodes.Pop();
+		root->val = '\0';
+		root->weigth = root->pLeft->weigth + root->pRight->weigth;
+		if (!huffNodes.IsEmpty())
+			huffNodes.Push(root, root->weigth);
 	}
-	for (int i = 0, nodeCnt = 0; i < 256; ++i)
-	{
-		if (chars[i] > 0)
-		{
-			nodes[nodeCnt].initRoot(TreeVal(chars[i], i));
-			++nodeCnt;
-		}
-	}
-	qsort(nodes, cnt, sizeof(TreeVal), compareTrees);
-	return true;
+	return root;
 }
 
 bool archive(const char * inputFile, const char* outputFile)
 {
-    FILE * input,* output;
+	FILE * input, *output;
+	int cntChars[256] = { 0 };
+	HuffNode * root;
+	size_t size;
+
+
 	input = fopen(inputFile, "rb");
-    if (!input)
-    {
-        std::cout << "Cannot open file for reading!" << std::endl;
-        return false;
-    }
+	if (!input)
+	{
+		std::cout << "Cannot open file for reading!" << std::endl;
+		return false;
+	}
 
 	output = fopen(outputFile, "wb");
-    if (!output)
-    {
-        std::cout << "Cannot open file for writing!" << std::endl;
-        return false;
-    }
-	BinaryTree<TreeVal> huffmanTree;
-	buildHuffTree(input, huffmanTree);
+	if (!output)
+	{
+		std::cout << "Cannot open file for writing!" << std::endl;
+		return false;
+	}
 
+	countChars(input, cntChars);
+	root = buildTree(cntChars);
+	printHuff(root);
 
-    fclose(input);
-    fclose(output);
-    return true;
+	fclose(input);
+	fclose(output);
+	return true;
 }
 
 bool extract(const char* inputFile, const char* outputFile)

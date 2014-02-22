@@ -23,10 +23,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BinaryTree.hpp">
+    <ClInclude Include="Huffman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Huffman.h">
+    <ClInclude Include="HuffTree.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="heap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
