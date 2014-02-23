@@ -28,5 +28,6 @@ int main(int argc, char *argv[])
             std::cout << "1st argument should be \"-a\" or \"-u\"!" << std::endl;
         }
     }
+
     return 0;
 }

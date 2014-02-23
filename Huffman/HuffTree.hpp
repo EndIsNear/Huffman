@@ -2,6 +2,7 @@
 #define HUFF_TREE_HPP
 #include <cstdlib>
 #include <iostream>
+#include "heap.hpp"
 
 struct HuffNode
 {
@@ -15,15 +16,46 @@ struct HuffNode
 		weigth = _weigth;
 		pLeft = NULL;
 		pRight = NULL;
+		isLeaf = true;
 	}
 	char val;
 	int weigth;
 	HuffNode *pLeft, *pRight;
+	bool isLeaf;
 };
 
-int compareNodes(const void* left, const void* right)
+size_t writeNodes(HuffNode* root, FILE * output)
 {
-	return ((HuffNode*)left)->weigth - ((HuffNode*)right)->weigth;
+	if (root->isLeaf)
+		return fwrite(root, sizeof(HuffNode), 1, output) > 0 ? 1 : 0;
+	else
+		return writeNodes(root->pLeft, output) + writeNodes(root->pRight, output);
+}
+
+void writeToFile(HuffNode* root, FILE * output)
+{
+	fseek(output, 0, SEEK_SET);
+	size_t size = 0;
+	fwrite(&size, sizeof(size_t), 1, output);
+	size = writeNodes(root, output);
+	fseek(output, 0, SEEK_SET);
+	fwrite(&size, sizeof(size_t), 1, output);
+	fseek(output, sizeof(size)+size * sizeof(HuffNode), SEEK_SET);
+}
+
+void readFromFile(Heap<HuffNode*>& huffNodes, FILE * input)
+{
+	fseek(input, 0, SEEK_SET);
+	size_t size;
+	HuffNode * tmp;
+
+	fread(&size, sizeof(size), 1, input);
+	for (size_t i = 0; i < size; ++i)
+	{
+		tmp = new HuffNode;
+		fread(tmp, sizeof(HuffNode), 1, input);
+		huffNodes.Push(tmp, tmp->weigth);
+	}
 }
 
 void printHuff(HuffNode* root)

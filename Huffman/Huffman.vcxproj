@@ -82,6 +82,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bitset.h" />
     <ClInclude Include="heap.hpp" />
     <ClInclude Include="HuffTree.hpp" />
     <ClInclude Include="Huffman.h" />
